@@ -3,20 +3,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "emulator.h"
+#include "emulator_function.h"
+#include "instruction.h"
+
+// 1 MB memory
 #define MEMORY_SIZE (1024 * 1024)
 
-enum Register { EAX, ECX, EDX, EBX, ESP, EBP, ESI, EDI, REGISTER_COUNT };
 char *registers_name[] = {"EAX", "ECX", "EDX", "EBX",
                           "ESP", "EBP", "ESI", "EDI"};
-typedef struct {
-  uint32_t registers[REGISTER_COUNT];
-  uint32_t eflags;
-
-  // memory (byte seq)
-  uint8_t *memory;
-  // instruction pointer (PC)
-  uint32_t eip;
-} Emulator;
 
 static Emulator *create_emu(size_t size, uint32_t eip, uint32_t esp) {
   Emulator *emu = malloc(sizeof(Emulator));
@@ -44,59 +39,6 @@ static void dump_registers(Emulator *emu) {
   }
 
   printf("EIP = %08x\n", emu->eip);
-}
-
-uint32_t get_code8(Emulator *emu, int index) {
-  return emu->memory[emu->eip + index];
-}
-
-int32_t get_sign_code8(Emulator *emu, int index) {
-  return (int8_t)emu->memory[emu->eip + index];
-}
-
-uint32_t get_code32(Emulator *emu, int index) {
-  int i;
-  uint32_t ret = 0;
-
-  // little endian
-  for (i = 0; i < 4; i++) {
-    ret |= get_code8(emu, index + i) << (i * 8);
-  }
-  return ret;
-}
-
-int32_t get_sign_code32(Emulator *emu, int index) {
-  return (int32_t)get_code32(emu, index);
-}
-
-void mov_r32_imm32(Emulator *emu) {
-  uint8_t reg = get_code8(emu, 0) - 0xB8;
-  uint32_t value = get_code32(emu, 1);
-  emu->registers[reg] = value;
-  emu->eip += 5;
-}
-
-void short_jump(Emulator *emu) {
-  int8_t diff = get_sign_code8(emu, 1);
-  emu->eip += (diff + 2);
-}
-
-void near_jump(Emulator *emu) {
-  int32_t diff = get_sign_code32(emu, 1);
-  emu->eip += (diff + 5);
-}
-
-typedef void instruction_func_t(Emulator *);
-instruction_func_t *instructions[256];
-
-void init_instructions(void) {
-  int i;
-  memset(instructions, 0, sizeof(instructions));
-  for (i = 0; i < 8; i++) {
-    instructions[0xB8 + i] = mov_r32_imm32;
-  }
-  instructions[0xE9] = near_jump;
-  instructions[0xEB] = short_jump;
 }
 
 int main(int argc, char *argv[]) {
