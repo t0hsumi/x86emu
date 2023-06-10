@@ -32,4 +32,8 @@ int32_t is_carry(Emulator *emu);
 int32_t is_zero(Emulator *emu);
 int32_t is_sign(Emulator *emu);
 int32_t is_overflow(Emulator *emu);
+
+uint8_t get_register8(Emulator *emu, int index);
+void set_register8(Emulator *emu, int index, uint8_t value);
+
 #endif

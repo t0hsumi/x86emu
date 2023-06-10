@@ -1,4 +1,5 @@
 #include "emulator_function.h"
+#include "emulator.h"
 #include <stdint.h>
 
 uint32_t get_code8(Emulator *emu, int index) {
@@ -118,4 +119,22 @@ void update_eflags_sub(Emulator *emu, uint32_t v1, uint32_t v2,
   set_zero(emu, result == 0);
   set_sign(emu, signr);
   set_overflow(emu, sign1 != sign2 && sign1 != signr);
+}
+
+uint8_t get_register8(Emulator *emu, int index) {
+  if (index < 4) {
+    return emu->registers[index] & 0xff;
+  } else {
+    return (emu->registers[index - 4] >> 8) & 0xff;
+  }
+}
+
+void set_register8(Emulator *emu, int index, uint8_t value) {
+  if (index < 4) {
+    uint32_t r = emu->registers[index] & 0xffffff00;
+    emu->registers[index] = r | (uint32_t)value;
+  } else {
+    uint32_t r = emu->registers[index - 4] & 0xffff00ff;
+    emu->registers[index] = r | ((uint32_t)value << 8);
+  }
 }
