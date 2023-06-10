@@ -2,7 +2,9 @@ TARGET = px86.exe
 OBJS = main.o emulator_function.o instruction.o modrm.o
 
 CC = gcc
+RM = rm
 CFLAGS += -Wall
+RMFLAGS += -rf
 
 .PHONY: all
 all :
@@ -16,4 +18,4 @@ $(TARGET) : $(OBJS) Makefile
 
 .PHONY: clean
 clean:
-	rm -rf $(OBJS)
+	$(RM) $(RMFLAGS) $(OBJS)
