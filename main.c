@@ -41,9 +41,45 @@ static void dump_registers(Emulator *emu) {
   printf("EIP = %08x\n", emu->eip);
 }
 
-int main(int argc, char *argv[]) {
+int opt_remove_at(int argc, char *argv[], int index) {
+  if (index < 0 || argc <= index) {
+    return argc;
+  } else {
+    int i = index;
+    for (; i < argc - 1; i++) {
+      argv[i] = argv[i + 1];
+    }
+    argv[i] = NULL;
+    return argc - 1;
+  }
+}
+
+void read_binary(Emulator *emu, const char *filepath) {
   FILE *binary;
+  binary = fopen(filepath, "rb");
+  if (binary == NULL) {
+    printf("%s : cannot open the file\n", filepath);
+    exit(1);
+  }
+
+  fread(emu->memory + 0x7c00, 1, 0x200, binary);
+  fclose(binary);
+}
+
+int main(int argc, char *argv[]) {
   Emulator *emu;
+  int i;
+  int quiet = 0;
+
+  i = 1;
+  while (i < argc) {
+    if (strcmp(argv[i], "-q") == 0) {
+      quiet = 1;
+      argc = opt_remove_at(argc, argv, i);
+    } else {
+      i++;
+    }
+  }
 
   if (argc != 2) {
     printf("Usage: ./px86 filename\n");
@@ -52,22 +88,16 @@ int main(int argc, char *argv[]) {
 
   // memory size, eip, esp
   emu = create_emu(MEMORY_SIZE, 0x7c00, 0x7c00);
-  binary = fopen(argv[1], "rb");
-  if (binary == NULL) {
-    printf("%s : cannot open the file\n", argv[1]);
-    return 1;
-  }
-
-  fread(emu->memory + 0x7c00, 1, 0x200, binary);
-  fclose(binary);
+  read_binary(emu, argv[1]);
 
   init_instructions();
 
   while (emu->eip < MEMORY_SIZE) {
     uint8_t code = get_code8(emu, 0);
     // output program counter and binary to be executed
-    printf("EIP = %X, CODE = %02X\n", emu->eip, code);
-
+    if (!quiet) {
+      printf("EIP= %X, CODE = %02X\n", emu->eip, code);
+    }
     if (instructions[code] == NULL) {
       // stop program when unimplemented instruction is detected
       printf("\n\n Not Implemented: %x\n", code);
