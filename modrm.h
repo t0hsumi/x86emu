@@ -47,4 +47,12 @@ uint32_t get_r32(Emulator *emu, ModRM *modrm);
 // get the value of register or memory
 uint32_t get_rm32(Emulator *emu, ModRM *modrm);
 
+// get and set the value of register of size 8 bits
+uint8_t get_rm8(Emulator *emu, ModRM *modrm);
+void set_rm8(Emulator *emu, ModRM *modrm, uint8_t value);
+
+// get and set the value of register of size 8 bits
+uint8_t get_r8(Emulator *emu, ModRM *modrm);
+void set_r8(Emulator *emu, ModRM *modrm, uint8_t value);
+
 #endif
