@@ -1,3 +1,11 @@
+/*
+   modrm
+
+   lists of procedures related to ModR/M.
+   Only parse_modrm operates eip. At the end of parse_modrm,
+   eip is considered to point to next opcode 
+*/
+
 #ifndef MODRM_H_
 #define MODRM_H_
 

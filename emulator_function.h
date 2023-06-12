@@ -1,3 +1,10 @@
+/*
+   emulator_function
+
+   get and set the value of memory, registers and flag of emulator
+   The procedures written here doesn't change eip (program counter).
+*/
+
 #ifndef EMULATOR_FUNCTION_H_
 #define EMULATOR_FUNCTION_H_
 

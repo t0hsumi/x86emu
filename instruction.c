@@ -1,3 +1,6 @@
+/*
+   lists of the implementatons of assembly operation
+*/
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
