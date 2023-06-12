@@ -135,6 +135,6 @@ void set_register8(Emulator *emu, int index, uint8_t value) {
     emu->registers[index] = r | (uint32_t)value;
   } else {
     uint32_t r = emu->registers[index - 4] & 0xffff00ff;
-    emu->registers[index] = r | ((uint32_t)value << 8);
+    emu->registers[index - 4] = r | ((uint32_t)value << 8);
   }
 }
