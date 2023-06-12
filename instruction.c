@@ -79,7 +79,9 @@ static void sub_rm32_imm8(Emulator *emu, ModRM *modrm) {
   uint32_t rm32 = get_rm32(emu, modrm);
   uint32_t imm8 = (int32_t)get_sign_code8(emu, 0);
   emu->eip += 1;
+  uint64_t result = rm32 - imm8;
   set_rm32(emu, modrm, rm32 - imm8);
+  update_eflags_sub(emu, rm32, imm8, result);
 }
 
 static void cmp_rm32_imm8(Emulator *emu, ModRM *modrm) {
